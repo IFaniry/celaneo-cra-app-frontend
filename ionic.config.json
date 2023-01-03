@@ -1,0 +1,7 @@
+{
+  "name": "cra-ionic",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}

@@ -3,14 +3,16 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "@capacitor/android": "^4.6.1",
     "@capacitor/app": "4.1.1",
-    "@capacitor/core": "4.6.1",
+    "@capacitor/core": "^4.6.1",
     "@capacitor/haptics": "4.1.0",
+    "@capacitor/ios": "^4.6.1",
     "@capacitor/keyboard": "4.1.0",
     "@capacitor/status-bar": "4.1.1",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
-    "@ionic/react": "^6.0.0",
+    "@ionic/react": "^6.4.1",
     "@ionic/react-router": "^6.0.0",
     "@mantine/core": "^5.10.0",
     "@mantine/dates": "^5.10.0",
@@ -30,6 +32,7 @@
     "history": "^4.9.0",
     "ionicons": "^6.0.3",
     "react": "^18.2.0",
+    "react-calendar": "^4.0.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.41.5",
     "react-router": "^5.2.0",
@@ -75,7 +78,9 @@
     ]
   },
   "devDependencies": {
-    "@capacitor/cli": "4.6.1"
+    "@capacitor/cli": "^4.6.1",
+    "@ionic/cli": "6.20.6",
+    "@types/react-calendar": "^3.9.0"
   },
   "description": "An Ionic project"
 }

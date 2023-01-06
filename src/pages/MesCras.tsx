@@ -195,9 +195,9 @@ const WorkVolumeSelect = ({
             field.onChange(dayjs(date).format());
           }}
           data={[
+            'être en congé ou absent',
             'travailler à plein temps',
             'travailler une demi-journée',
-            'être en congé ou absent',
           ]}
         />
       )}
@@ -303,8 +303,8 @@ const DatePicker = ({ control }: { control: Control<FormValues, any> }) => {
       onChange={(mantineUpdatedWorkDays) => {
         // console.log('mantineUpdatedWorkDays', mantineUpdatedWorkDays);
         // console.log('workDays', workDays);
-        const numMantineUpdatedWorkDays = mantineUpdatedWorkDays.length;
-        const numWorkDays = workDays.length;
+        const numMantineUpdatedWorkDays = mantineUpdatedWorkDays.length; // 클릭한 날짜
+        const numWorkDays = workDays.length; // ok한 날짜
 
         let updatedWorkDays = mantineUpdatedWorkDays;
         // let selectedCra = updatedWorkDays[0];
@@ -451,6 +451,7 @@ type FormValues = {
   calendar: {
     workDate: string;
     nbHour: number;
+    test: string;
   }[];
 };
 

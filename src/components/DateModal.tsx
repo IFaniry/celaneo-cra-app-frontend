@@ -8,7 +8,6 @@ type DateModalProps = {
   setOpenModal: Dispatch<boolean>;
   openModal: boolean;
   date: Date;
-  setAgree: Dispatch<boolean>;
 };
 
 const DateModal = ({
@@ -17,17 +16,19 @@ const DateModal = ({
   setOpenModal,
   openModal,
   date,
-  setAgree,
 }: DateModalProps) => {
   const selectDate = value.map((item) => formatDate(item));
 
   const buttonHandler = () => {
-    setAgree(true);
-    setOpenModal(false);
-    if (selectDate.includes(formatDate(date))) {
-      const test = value.filter((it) => formatDate(it) !== formatDate(date));
-      setValue(test);
+    if (!selectDate.includes(formatDate(date))) {
+      setValue([...value, date]);
+    } else {
+      const dates = value.filter(
+        (item) => formatDate(item) !== formatDate(date),
+      );
+      setValue(dates);
     }
+    setOpenModal(false);
   };
 
   return (
@@ -43,7 +44,7 @@ const DateModal = ({
           </Button>
           <Button
             onClick={() => {
-              setAgree(false);
+              // setAgree(false);
               setOpenModal(false);
             }}
           >

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Calendar } from '@mantine/dates';
 import 'dayjs/locale/fr';
 import dayjs from 'dayjs';
@@ -10,26 +10,17 @@ const MyCras = () => {
   const [value, setValue] = useState<Date[]>([]);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const [agree, setAgree] = useState<boolean>(false);
 
   const dateClickHandler = (e: Date) => {
     setOpenModal(true);
     setCurrentDate(e);
   };
 
-  useEffect(() => {
-    if (agree) {
-      setValue((prev) => [...prev, currentDate]);
-      setAgree(false);
-    }
-  }, [agree, currentDate, value]);
-
   return (
     <>
       {openModal && (
         <DateModal
           value={value}
-          setAgree={setAgree}
           setValue={setValue}
           date={currentDate}
           openModal={openModal}

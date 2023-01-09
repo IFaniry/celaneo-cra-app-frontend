@@ -1,14 +1,6 @@
 /** @jsxImportSource @emotion/react */
-import { useState } from 'react';
+import { useState, Dispatch, SetStateAction } from 'react';
 import { renderToString } from 'react-dom/server';
-import {
-  useForm,
-  Controller,
-  useController,
-  Control,
-  FieldValues,
-  useFieldArray,
-} from 'react-hook-form';
 // TODO: uninstall @emotion/styled????
 import { css } from '@emotion/react';
 import {
@@ -80,6 +72,11 @@ const getWorkDaysCount = (date: Date) => {
   return count;
 };
 
+type DayAttributes = {
+  nbHour: number;
+};
+type Cras = Record<string, DayAttributes>;
+
 // https://stackoverflow.com/a/37069277
 // const getWorkDaysCount = (startDate: Date, endDate: Date) => {
 //   let count = 0;
@@ -109,156 +106,62 @@ const useCalendarStyles = createStyles((theme) => ({
   },
 }));
 
-const DaySwitch = () => {
-  const theme = useMantineTheme();
-
-  const [isFullDay, setIsFullDay] = useState(true);
-
-  return (
-    <Switch
-      size="xl"
-      checked={isFullDay}
-      onChange={(event) => {
-        setIsFullDay(event.currentTarget.checked);
-      }}
-      label={isFullDay ? 'Journée pleine' : 'Demi-journée'}
-      thumbIcon={
-        isFullDay ? (
-          <IconSquare
-            size={12}
-            stroke={1}
-            color={theme.colors.blue[2]}
-            fill={theme.colors.blue[2]}
-          />
-        ) : (
-          <IconSquareHalf
-            size={12}
-            stroke={1}
-            color={theme.colors.blue[7]}
-            css={{ transform: 'rotate(270deg)' }}
-          />
-        )
-      }
-    />
-  );
-};
-
 // TODO: refine any type
 const WorkVolumeSelect = ({
-  control,
   date,
-  month,
+  setCras,
 }: {
-  control: Control<FormValues, any>;
   date: Date;
-  month: Date;
+  setCras: Dispatch<SetStateAction<Cras>>;
 }) => {
-  const theme = useMantineTheme();
-
-  const { getValues } = useForm();
-
-  const day = date.getDate();
-
-  const { field } = useController({
-    control,
-    name: `calendar.${day - getFirstWorkDayOfMonth(month)}.workDate`,
-  });
+  // TODO: refine  var name and type
+  const [value, setValue] = useState('être en congé ou absent');
 
   return (
-    <Controller
-      control={control}
-      name={`calendar.${day - getFirstWorkDayOfMonth(month)}.nbHour`}
-      render={({ field: { onChange, onBlur, value } }) => (
-        <NativeSelect
-          label="Je vais"
-          value={value}
-          onBlur={onBlur}
-          onChange={(event) => {
-            console.log('getValues', getValues('calendar'));
-            let nbHour: number;
-            switch (event.currentTarget.value) {
-              case 'travailler à plein temps':
-                nbHour = 7;
-                break;
-              case 'travailler une demi-journée':
-                nbHour = 3.5;
-                break;
-              case 'être en congé ou absent':
-                nbHour = 0;
-                break;
-              default:
-                throw new Error(
-                  'Work volume must be one of ["travailler à plein temps", "travailler une demi-journée", "être en congé ou absent"].',
-                );
-            }
-            onChange(nbHour);
-            field.onChange(dayjs(date).format());
-          }}
-          data={[
-            'travailler à plein temps',
-            'travailler une demi-journée',
-            'être en congé ou absent',
-          ]}
-        />
-      )}
-    />
+    <NativeSelect
+    label="Je vais"
+    value={value}
+    onChange={(event) => {
+      let nbHour: number;
+      switch (event.currentTarget.value) {
+        case 'travailler à plein temps':
+          nbHour = 7;
+          break;
+        case 'travailler une demi-journée':
+          nbHour = 3.5;
+          break;
+        case 'être en congé ou absent':
+          nbHour = 0;
+          break;
+        default:
+          throw new Error(
+            'Work volume must be one of ["travailler à plein temps", "travailler une demi-journée", "être en congé ou absent"].',
+          );
+      }
+      // TODO: refine
+      setValue(value);
+      // field.onChange(dayjs(date).format());
+      setCras(cras => ({...cras, [dayjs(date).format()]: { nbHour } }));
+    }}
+    data={[
+      'travailler à plein temps',
+      'travailler une demi-journée',
+      'être en congé ou absent',
+    ]}
+  />
   );
 };
 
 const CustomDayCell = ({
   date,
   month,
-  fullDayBackground,
-  halfDayBackground,
+  cras,
 }: {
   date: Date;
   month: Date;
-  fullDayBackground: string;
-  halfDayBackground: string;
+  cras: Cras;
 }) => {
-  const { getValues } = useForm<FormValues>();
-
-  const day = date.getDate();
-
-  return (
-    <div
-      data-full={
-        getValues(`calendar.${day - getFirstWorkDayOfMonth(month)}.nbHour`) ===
-          7 || undefined
-      }
-      data-half={
-        getValues(`calendar.${day - getFirstWorkDayOfMonth(month)}.nbHour`) ===
-          3.5 || undefined
-      }
-      css={css`
-        &[data-full] {
-          background-image: url(${fullDayBackground});
-          background-repeat: no-repeat;
-          background-position: center;
-          color: #fff;
-        }
-        &[data-half] {
-          background-image: url(${halfDayBackground});
-          background-repeat: no-repeat;
-          background-position: center;
-          color: #fff;
-        }
-      `}
-    >
-      {day}
-    </div>
-  );
-};
-
-const DatePicker = ({ control }: { control: Control<FormValues, any> }) => {
   const theme = useMantineTheme();
-
-  const { getValues } = useForm<FormValues>();
-  // TODO: useFieldArray from hook form
-  // const { fields } = useFieldArray({
-  //   control,
-  //   name: 'calendar',
-  // });
 
   const fullDayBackgroundStr = renderToString(
     <IconSquare
@@ -283,70 +186,70 @@ const DatePicker = ({ control }: { control: Control<FormValues, any> }) => {
   const halfDayBackground = `data:image/svg+xml;base64,${window.btoa(
     halfDayBackgroundStr,
   )}`;
+  // TODO: use hook for getting fullDayBackground and halfDayBackground
+  const day = date.getDate();
 
+  // TODO: day belongs to month and full or half day
+  return (
+    <div
+      data-full={
+        (dayjs(month).isSame(dayjs(date), 'month') &&
+        cras?.[dayjs(date).format()]?.nbHour === 7) ? true : undefined
+      }
+      data-half={
+        (dayjs(month).isSame(dayjs(date), 'month') &&
+        cras?.[dayjs(date).format()]?.nbHour === 3.5) ? true : undefined
+      }
+      css={css`
+        &[data-full] {
+          background-image: url(${fullDayBackground});
+          background-repeat: no-repeat;
+          background-position: center;
+          color: #fff;
+        }
+        &[data-half] {
+          background-image: url(${halfDayBackground});
+          background-repeat: no-repeat;
+          background-position: center;
+          color: #fff;
+        }
+      `}
+    >
+      {day}
+    </div>
+  );
+};
+
+const DatePicker = () => {
   const { classes, cx } = useCalendarStyles();
 
-  const [cras, setCras] = useState<Cra[]>([]);
-  const [workDays, setWorkDays] = useState<Date[]>([]);
+  const [cras, setCras] = useState<Cras>({});
+  const [selectedDay, setSelectedDay] = useState<Date|null>(null);
   const [month, onMonthChange] = useState(new Date());
 
   return (
     <Calendar
-      multiple
       locale="fr"
       minDate={new Date(2023, 0, 0)}
       maxDate={dayjs(new Date()).endOf('month').add(1, 'month').toDate()}
       allowLevelChange={false}
       month={month}
       onMonthChange={onMonthChange}
-      value={workDays}
-      onChange={(mantineUpdatedWorkDays) => {
-        // console.log('mantineUpdatedWorkDays', mantineUpdatedWorkDays);
-        // console.log('workDays', workDays);
-        const numMantineUpdatedWorkDays = mantineUpdatedWorkDays.length;
-        const numWorkDays = workDays.length;
-
-        let updatedWorkDays = mantineUpdatedWorkDays;
-        // let selectedCra = updatedWorkDays[0];
-        let selectedCra: Date;
-        if (numMantineUpdatedWorkDays < numWorkDays) {
-          selectedCra = workDays[0];
-          for (let i = 0; i < numWorkDays; i++) {
-            if (!dayjs(workDays[i]).isSame(dayjs(workDays[i]), 'day')) {
-              // Override Mantine Calendar default functionality
-              // add back unselected date
-              selectedCra = workDays[i];
-              updatedWorkDays = [...updatedWorkDays, selectedCra];
-              break;
-            }
-          }
-          // TODO: verify!
-          // return;
-        } else {
-          selectedCra = mantineUpdatedWorkDays[0];
-          for (let i = 0; i < numMantineUpdatedWorkDays; i++) {
-            if (
-              !dayjs(workDays[i]).isSame(
-                dayjs(mantineUpdatedWorkDays[i]),
-                'day',
-              )
-            ) {
-              selectedCra = mantineUpdatedWorkDays[i];
-              break;
-            }
-          }
+      value={selectedDay}
+      onChange={(newlySelectedDay) => {
+        if (!newlySelectedDay) {
+          return;
         }
 
-        setWorkDays(updatedWorkDays);
+        setSelectedDay(newlySelectedDay);
 
         openModal({
-          title: `Ce ${dayjs(selectedCra).format('dddd D MMMM')}`,
+          title: `Ce ${dayjs(newlySelectedDay).format('dddd D MMMM')}`,
           children: (
             <>
               <WorkVolumeSelect
-                control={control}
-                date={selectedCra}
-                month={month}
+                date={newlySelectedDay}
+                setCras={setCras}
               />
               <Textarea
                 label="et j'ajouterai"
@@ -358,11 +261,7 @@ const DatePicker = ({ control }: { control: Control<FormValues, any> }) => {
               <Button
                 type="submit"
                 onClick={() => {
-                  const cras: Cra[] = updatedWorkDays.map((workDay) => ({
-                    workDate: dayjs(workDay).format(),
-                    nbHour: 7, // TODO: implement
-                  }));
-                  setCras(cras);
+                  setCras(cras => ({...cras, '[day]': { nbHour: 7 } }));
                   closeAllModals();
                 }}
                 mt="md"
@@ -372,7 +271,7 @@ const DatePicker = ({ control }: { control: Control<FormValues, any> }) => {
               <Button
                 onClick={() => {
                   // TODO: implement
-                  // const cras: Cra[] = updatedWorkDays.map(workDay => ({
+                  // const cras: Cras[] = updatedWorkDays.map(workDay => ({
                   //   workDate: dayjs(workDay).format(),
                   //   nbHour: 7,
                   // }));
@@ -395,112 +294,22 @@ const DatePicker = ({ control }: { control: Control<FormValues, any> }) => {
         })
       }
       renderDay={(date) => {
-        const day = date.getDate();
         // TODO: import { useElementSize } from '@mantine/hooks'; to resize fullDayBackground??
         // TODO: check if controlled month work?
 
         // dayjs(month).isSame(dayjs(date), 'month')
         // isWeekend(date)
         return (
-          <Controller
-            control={control}
-            name={`calendar.${day - getFirstWorkDayOfMonth(month)}.workDate`}
-            render={({ field }) => (
-              <div
-                data-full={
-                  cras.find(
-                    (cra) =>
-                      dayjs(cra.workDate).isSame(dayjs(date), 'day') &&
-                      cra.nbHour === 7,
-                  )
-                    ? true
-                    : undefined
-                }
-                data-half={
-                  getValues(
-                    `calendar.${day - getFirstWorkDayOfMonth(month)}.nbHour`,
-                  ) === 3.5 || undefined
-                }
-                css={css`
-                  &[data-full] {
-                    background-image: url(${fullDayBackground});
-                    background-repeat: no-repeat;
-                    background-position: center;
-                    color: #fff;
-                  }
-                  &[data-half] {
-                    background-image: url(${halfDayBackground});
-                    background-repeat: no-repeat;
-                    background-position: center;
-                    color: #fff;
-                  }
-                `}
-              >
-                {day}
-              </div>
-            )}
-          />
+          <CustomDayCell cras={cras} month={month} date={date} />
         );
       }}
     />
   );
 };
 
-// TODO:
-type FormValues = {
-  calendar: {
-    workDate: string;
-    nbHour: number;
-  }[];
-};
-
-type Cra = {
-  workDate: string;
-  nbHour: number;
-};
-
 const MesCras = () => {
-  const theme = useMantineTheme();
-
-  // TODO: defaultValues
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    control,
-    watch,
-  } = useForm<FormValues>();
-  const cal = watch('calendar');
-  const onSubmit = (data: any) => console.log(data);
-
-  const fullDayBackgroundStr = renderToString(
-    <IconSquare
-      size={50}
-      stroke={0.5}
-      color={theme.colors.blue[6]}
-      fill={theme.colors.blue[6]}
-    />,
-  );
-  const fullDayBackground = `data:image/svg+xml;base64,${window.btoa(
-    fullDayBackgroundStr,
-  )}`;
-  // const halfDayBackgroundStr = renderToString(<IconSquareHalf size={50} stroke={0.5} color={theme.colors.blue[7]} css={{ transform: 'rotate(45deg)' }} />);
-  const halfDayBackgroundStr = renderToString(
-    <IconSquare
-      size={50}
-      stroke={0.5}
-      color={theme.colors.blue[3]}
-      fill={theme.colors.blue[3]}
-    />,
-  );
-  const halfDayBackground = `data:image/svg+xml;base64,${window.btoa(
-    halfDayBackgroundStr,
-  )}`;
-
-  const { classes, cx } = useCalendarStyles();
-
-  const [cras, setCras] = useState<Cra[]>([]);
-  const [workDays, setWorkDays] = useState<Date[]>([]);
+  // const [cras, setCras] = useState<Cras>({});
+  // const [selectedDay, setSelectedDay] = useState<Date|null>(null);
 
   return (
     <IonPage>
@@ -516,12 +325,10 @@ const MesCras = () => {
           </IonToolbar>
         </IonHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <DatePicker control={control} />
-          <pre>
-            <code>{JSON.stringify(cal, null, 2)}</code>
-          </pre>
-        </form>
+        <DatePicker />
+        <pre>
+          <code>JSON.stringify(cal, null, 2)</code>
+        </pre>
       </IonContent>
     </IonPage>
   );

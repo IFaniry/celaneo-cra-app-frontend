@@ -7,12 +7,12 @@ import {
   IonTabBar,
   IonTabButton,
   IonTabs,
-  setupIonicReact
+  setupIonicReact,
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { ellipse, triangle } from 'ionicons/icons';
 import MesClients from './pages/MesClients';
-import MesCras from './pages/MesCras';
+// import MesCras from './pages/MesCras';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -32,6 +32,7 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import MyCras from './pages/MyCras';
 
 setupIonicReact();
 
@@ -44,7 +45,8 @@ const App: React.FC = () => (
             <MesClients />
           </Route>
           <Route exact path="/mes-cras">
-            <MesCras />
+            {/* <MesCras /> */}
+            <MyCras />
           </Route>
           <Route exact path="/">
             <Redirect to="/mes-cras" />

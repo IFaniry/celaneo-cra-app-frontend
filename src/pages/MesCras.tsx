@@ -195,9 +195,9 @@ const WorkVolumeSelect = ({
             field.onChange(dayjs(date).format());
           }}
           data={[
+            'être en congé ou absent',
             'travailler à plein temps',
             'travailler une demi-journée',
-            'être en congé ou absent',
           ]}
         />
       )}
@@ -451,6 +451,7 @@ type FormValues = {
   calendar: {
     workDate: string;
     nbHour: number;
+    test: string;
   }[];
 };
 

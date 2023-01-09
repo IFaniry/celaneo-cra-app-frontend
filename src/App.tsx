@@ -12,7 +12,7 @@ import {
 import { IonReactRouter } from '@ionic/react-router';
 import { ellipse, triangle } from 'ionicons/icons';
 import MesClients from './pages/MesClients';
-import MesCras from './pages/MesCras';
+// import MesCras from './pages/MesCras';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';

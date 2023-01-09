@@ -1,40 +1,54 @@
 import { Button, Group, Modal } from '@mantine/core';
-import dayjs from 'dayjs';
 import { Dispatch } from 'react';
+import { formatDate } from '../constants/constant';
 
 type DateModalProps = {
   setValue: Dispatch<Date[]>;
+  value: Date[];
   setOpenModal: Dispatch<boolean>;
   openModal: boolean;
-  date: Date | undefined;
+  date: Date;
+  setAgree: Dispatch<boolean>;
 };
 
 const DateModal = ({
   setValue,
+  value,
   setOpenModal,
   openModal,
   date,
+  setAgree,
 }: DateModalProps) => {
-  // const okButton = () => {};
+  const selectDate = value.map((item) => formatDate(item));
+
+  const buttonHandler = () => {
+    setAgree(true);
+    setOpenModal(false);
+    if (selectDate.includes(formatDate(date))) {
+      const test = value.filter((it) => formatDate(it) !== formatDate(date));
+      setValue(test);
+    }
+  };
+
   return (
     <>
       <Modal
         opened={openModal}
         onClose={() => setOpenModal(false)}
-        title={`Ce ${dayjs(date).format('dddd D MMMM')}`}
+        title={`Ce ${formatDate(date)}`}
       >
         <Group position="center">
+          <Button onClick={buttonHandler}>
+            {selectDate.includes(formatDate(date)) ? 'Annule' : 'Ok'}
+          </Button>
           <Button
             onClick={() => {
-              if (date !== undefined) {
-                setValue(date);
-                setOpenModal(false);
-              }
+              setAgree(false);
+              setOpenModal(false);
             }}
           >
-            Ok
+            Close
           </Button>
-          <Button onClick={() => setOpenModal(true)}>Close</Button>
         </Group>
       </Modal>
     </>

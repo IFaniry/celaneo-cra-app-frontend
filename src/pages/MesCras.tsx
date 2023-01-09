@@ -303,8 +303,8 @@ const DatePicker = ({ control }: { control: Control<FormValues, any> }) => {
       onChange={(mantineUpdatedWorkDays) => {
         // console.log('mantineUpdatedWorkDays', mantineUpdatedWorkDays);
         // console.log('workDays', workDays);
-        const numMantineUpdatedWorkDays = mantineUpdatedWorkDays.length; // 클릭한 날짜
-        const numWorkDays = workDays.length; // ok한 날짜
+        const numMantineUpdatedWorkDays = mantineUpdatedWorkDays.length;
+        const numWorkDays = workDays.length;
 
         let updatedWorkDays = mantineUpdatedWorkDays;
         // let selectedCra = updatedWorkDays[0];

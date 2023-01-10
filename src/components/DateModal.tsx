@@ -1,35 +1,57 @@
-import { Button, Group, Modal } from '@mantine/core';
+import { Button, Group, Modal, Select } from '@mantine/core';
 import { Dispatch } from 'react';
 import { formatDate } from '../constants/constant';
 
+type Day = { dates: Date; option: string; desc: string };
+
 type DateModalProps = {
-  setValue: Dispatch<Date[]>;
-  value: Date[];
+  setDay: Dispatch<Day[]>;
+  day: Day[];
   setOpenModal: Dispatch<boolean>;
   openModal: boolean;
   date: Date;
+  setDateOption: Dispatch<string>;
+  dateOption: string;
 };
 
 const DateModal = ({
-  setValue,
-  value,
+  setDay,
+  day,
   setOpenModal,
   openModal,
   date,
+  setDateOption,
+  dateOption,
 }: DateModalProps) => {
-  const selectDate = value.map((item) => formatDate(item));
-
   const buttonHandler = () => {
-    if (!selectDate.includes(formatDate(date))) {
-      setValue([...value, date]);
+    const findIndex = day.findIndex(
+      (item) => formatDate(item.dates) === formatDate(date),
+    );
+
+    let copyArr = [...day];
+    if (findIndex !== -1) {
+      copyArr[findIndex] = {
+        ...copyArr[findIndex],
+        option: dateOption,
+        desc: 'desc',
+      };
+      setDay(copyArr);
     } else {
-      const dates = value.filter(
-        (item) => formatDate(item) !== formatDate(date),
-      );
-      setValue(dates);
+      setDay([
+        ...day,
+        {
+          dates: date,
+          option: dateOption,
+          desc: 'desc',
+        },
+      ]);
     }
     setOpenModal(false);
   };
+
+  const [selectedOption] = day.filter(
+    (item) => formatDate(item.dates) === formatDate(date),
+  );
 
   return (
     <>
@@ -39,12 +61,21 @@ const DateModal = ({
         title={`Ce ${formatDate(date)}`}
       >
         <Group position="center">
-          <Button onClick={buttonHandler}>
-            {selectDate.includes(formatDate(date)) ? 'Annule' : 'Ok'}
-          </Button>
+          <Select
+            placeholder="Choisir"
+            defaultValue={
+              selectedOption?.option ? selectedOption?.option : dateOption[0]
+            }
+            searchable
+            onSearchChange={setDateOption}
+            searchValue={dateOption}
+            nothingFound="No options"
+            data={['Journée', 'Demi-journée', 'Absence']}
+          />
+
+          <Button onClick={buttonHandler}>Ok</Button>
           <Button
             onClick={() => {
-              // setAgree(false);
               setOpenModal(false);
             }}
           >

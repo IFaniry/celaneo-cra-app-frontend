@@ -1,4 +1,4 @@
-import { Button, Group, Modal, Select } from '@mantine/core';
+import { Button, Group, Modal, Select, Textarea } from '@mantine/core';
 import { Dispatch } from 'react';
 import { formatDate } from '../constants/constant';
 
@@ -12,6 +12,8 @@ type DateModalProps = {
   date: Date;
   setDateOption: Dispatch<string>;
   dateOption: string;
+  setDescription: Dispatch<string>;
+  description: string;
 };
 
 const DateModal = ({
@@ -22,18 +24,20 @@ const DateModal = ({
   date,
   setDateOption,
   dateOption,
+  setDescription,
+  description,
 }: DateModalProps) => {
   const buttonHandler = () => {
     const findIndex = day.findIndex(
       (item) => formatDate(item.dates) === formatDate(date),
     );
-
     let copyArr = [...day];
+
     if (findIndex !== -1) {
       copyArr[findIndex] = {
         ...copyArr[findIndex],
         option: dateOption,
-        desc: 'desc',
+        desc: description,
       };
       setDay(copyArr);
     } else {
@@ -42,16 +46,18 @@ const DateModal = ({
         {
           dates: date,
           option: dateOption,
-          desc: 'desc',
+          desc: description,
         },
       ]);
     }
     setOpenModal(false);
   };
 
-  const [selectedOption] = day.filter(
+  const [selectedDay] = day.filter(
     (item) => formatDate(item.dates) === formatDate(date),
   );
+
+  console.log(day);
 
   return (
     <>
@@ -64,13 +70,22 @@ const DateModal = ({
           <Select
             placeholder="Choisir"
             defaultValue={
-              selectedOption?.option ? selectedOption?.option : dateOption[0]
+              selectedDay?.option ? selectedDay?.option : dateOption[0]
             }
             searchable
             onSearchChange={setDateOption}
             searchValue={dateOption}
             nothingFound="No options"
             data={['Journée', 'Demi-journée', 'Absence']}
+          />
+
+          <Textarea
+            value={selectedDay?.desc ? selectedDay?.desc : undefined}
+            onChange={(e) => {
+              setDescription(e.currentTarget.value);
+            }}
+            placeholder="Commentaire"
+            label="Commentaire"
           />
 
           <Button onClick={buttonHandler}>Ok</Button>

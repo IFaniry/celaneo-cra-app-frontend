@@ -12,11 +12,14 @@ const MyCras = () => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [dateOption, setDateOption] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
 
   const dateClickHandler = (e: Date) => {
     setOpenModal(true);
     setCurrentDate(e);
   };
+
+  // console.log('Day : ', day);
 
   return (
     <>
@@ -29,38 +32,32 @@ const MyCras = () => {
           date={currentDate}
           openModal={openModal}
           setOpenModal={setOpenModal}
+          setDescription={setDescription}
+          description={description}
         />
       )}
       <Calendar
         dayStyle={(date: Date, modifiers: DayModifiers) => {
-          const halfDay = day.filter(
-            (item: Day) => item.option === 'Demi-journée',
-          );
-          const halfDayFormat = halfDay.map((item: Day) =>
-            formatDate(item.dates),
-          );
-          const restDay = day.filter((item: Day) => item.option === 'Absence');
-          const restDayFormat = restDay.map((item: Day) =>
-            formatDate(item.dates),
-          );
+          const halfDay = day
+            .filter((item: Day) => item.option === 'Demi-journée')
+            .map((item: Day) => formatDate(item.dates));
+          const restDay = day
+            .filter((item: Day) => item.option === 'Absence')
+            .map((item: Day) => formatDate(item.dates));
 
           let bgColor: string;
-          if (
-            halfDay.length !== 0 &&
-            halfDayFormat.includes(formatDate(date))
-          ) {
+          if (halfDay.length !== 0 && halfDay.includes(formatDate(date))) {
             bgColor = 'white';
           } else {
             bgColor = '#DEF5E5';
           }
 
           let restDayStyle;
-          if (
-            restDay.length !== 0 &&
-            restDayFormat.includes(formatDate(date))
-          ) {
+          if (restDay.length !== 0 && restDay.includes(formatDate(date))) {
             restDayStyle = {
-              backgroundColor: '#8EC3B0',
+              borderColor: '#DEF5E5',
+              borderWidth: 2,
+              borderStyle: 'solid',
             };
           }
 
@@ -83,6 +80,10 @@ const MyCras = () => {
             color: '#594545',
           },
           day: {
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
             margin: '3px',
           },
         }}

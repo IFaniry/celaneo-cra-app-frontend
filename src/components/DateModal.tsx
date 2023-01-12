@@ -27,17 +27,16 @@ const DateModal = ({
   setDescription,
   description,
 }: DateModalProps) => {
+  const findIndex = day.findIndex(
+    (item) => formatDate(item.dates) === formatDate(date),
+  );
   const buttonHandler = () => {
-    const findIndex = day.findIndex(
-      (item) => formatDate(item.dates) === formatDate(date),
-    );
     let copyArr = [...day];
 
     if (findIndex !== -1) {
       copyArr[findIndex] = {
         ...copyArr[findIndex],
         option: dateOption,
-        desc: description,
       };
       setDay(copyArr);
     } else {
@@ -57,7 +56,18 @@ const DateModal = ({
     (item) => formatDate(item.dates) === formatDate(date),
   );
 
-  console.log(day);
+  const descHandler = (e: any) => {
+    let copyArr = [...day];
+    if (findIndex !== -1) {
+      copyArr[findIndex] = {
+        ...copyArr[findIndex],
+        desc: e.currentTarget.value,
+      };
+      setDay(copyArr);
+    } else {
+      setDescription(e.currentTarget.value);
+    }
+  };
 
   return (
     <>
@@ -80,10 +90,12 @@ const DateModal = ({
           />
 
           <Textarea
-            value={selectedDay?.desc ? selectedDay?.desc : undefined}
-            onChange={(e) => {
-              setDescription(e.currentTarget.value);
-            }}
+            value={
+              selectedDay?.desc || selectedDay?.desc === ''
+                ? selectedDay?.desc
+                : undefined
+            }
+            onChange={descHandler}
             placeholder="Commentaire"
             label="Commentaire"
           />

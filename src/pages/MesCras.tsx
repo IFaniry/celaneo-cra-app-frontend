@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import { useState, Dispatch, SetStateAction } from 'react';
 import { renderToString } from 'react-dom/server';
 // TODO: uninstall @emotion/styled????

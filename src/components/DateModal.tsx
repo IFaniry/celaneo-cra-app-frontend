@@ -48,6 +48,7 @@ const DateModal = ({
           desc: description,
         },
       ]);
+      setDescription('');
     }
     setOpenModal(false);
   };
